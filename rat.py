@@ -1,4 +1,26 @@
 from time import sleep
+from os import system
+
+class Space:
+	def __init__(self, border, wall, rat = False):
+		self.border = border
+		self.wall = wall
+		self.rat = rat
+	
+	def turn_wall(self):
+		self.wall = True
+
+	def __str__ (self):
+		
+		if self.wall == True:
+			return '1'
+
+		elif self.rat == True:
+			return 'R'
+
+		else:
+			return '0'
+
 
 class Board:
 	
@@ -12,26 +34,26 @@ class Board:
 
 		for lines in range(0, self.height):
 			for columns in range(0, self.width):
-				self.final_form.append(0)
+				if columns == 0 or columns == self.height or lines == 0 or lines == self.height -1:
+					space = Space(True, False)
+				else:
+					space = Space(False, False)
+				self.final_form.append(space)
 
 		for wall_pos in self.walls:
-			self.final_form[wall_pos] = 1
+			self.final_form[wall_pos].turn_wall()
 
 	def give_close_spaces(self, reference_pos):
 		close_spaces = []
 		where_to_look = [self.width + reference_pos, - self.width + reference_pos, 1 + reference_pos, -1 + reference_pos]
 		counter = 0
-		print(where_to_look)
 		while counter < len(where_to_look):
 			try:
 				# UP space
 				close_spaces.append(self.final_form[where_to_look[counter]])
-				print(self.final_form[where_to_look[counter]])
 			except:
 				close_spaces.append("Out of Bounds")
 			counter += 1
-		
-		print(close_spaces)
 		return close_spaces
 
 class Rat:
@@ -47,7 +69,7 @@ class Rat:
 		counter = 0
 		for space in around:
 			
-			if space == 0:
+			if space.wall == False:
 				return 'Up' if counter == 0 else 'Down' if counter == 1 else 'Right' if counter == 2 else 'Left'
 			counter += 1	
 
@@ -70,8 +92,8 @@ class Displayer:
 			break_line = 0
 			position = 0
 			last_position = False
-			self.board.final_form[self.rat.last_position] = 0
-			self.board.final_form[self.rat.position] = 'R'
+			self.board.final_form[self.rat.last_position] = Space(False, False)
+			self.board.final_form[self.rat.position] = Space(False, False, rat = True)
 			while break_line < self.board.width and last_position != True:
 
 				if break_line == 0:
@@ -94,13 +116,14 @@ class Displayer:
 
 			sleep(0.5)
 			self.start_run()
+			system('cls')
 			counter +=1
 
 
 
 if __name__ == "__main__":
 
-	my_board = Board(9,10,[2,20,38,45,82])
+	my_board = Board(9,10,[2,10,80,20,38,45,82])
 	my_board.setup_lab()
 	my_rat = Rat(my_board.width)
 	my_displayer = Displayer(my_board, my_rat)

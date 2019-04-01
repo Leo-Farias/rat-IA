@@ -1,40 +1,6 @@
 from time import sleep
-from os import system
-
-class Space:
-	'''
-	Class that populates our board, each space can have or have not a wall and the rat might or might not be on it.
-	'''
-	def __init__(self, wall, rat = False):
-		self.wall = wall
-		self.rat = rat
-	
-	def turn_wall(self):
-		'''
-		INFO: Method that turns the space's wall paremeter true.
-		'''
-		self.wall = True
-
-	def __str__ (self):
-		'''
-		INFO: Rewrite the string method so when the displayer class prints out the spaces it's more legible.
-		'''
-		
-		if self.wall == True:
-			return '*'
-
-		elif self.rat == True:
-			return 'R'
-
-		else:
-			return '0'
-
 
 class Board:
-	'''
-	Class that stores the spaces. It also gives the rat information about where it is, such as the 
-	'give_close_spaces' method.
-	'''
 	
 	def __init__(self, height, width, walls):
 		self.height = height
@@ -43,67 +9,51 @@ class Board:
 		self.final_form = []
 
 	def setup_lab(self):
-		'''
-		INFO: This method populates the final_form paremeter with the spaces beeing the itens of the list.
-		'''
+
 		for lines in range(0, self.height):
 			for columns in range(0, self.width):
-				# this if statment is getting all the border positions and setting it to be walls.
-				if columns == 0 or columns == self.height or lines == 0 or lines == self.height -1:
-					space = Space(True)
-				else:
-					space = Space(False)
-				self.final_form.append(space)
+				self.final_form.append(0)
 
 		for wall_pos in self.walls:
-			self.final_form[wall_pos].turn_wall()
+			self.final_form[wall_pos] = 1
 
 	def give_close_spaces(self, reference_pos):
-		'''
-		INFO: This method is responsible for sending a list for the rat class which based on it the rat can "see" if there
-		are any walls around it. 
-		INPUT: The method needs a reference position.
-		OUTPUT: It returns a list with Space objects.
-		'''
 		close_spaces = []
-		where_to_look = [- self.width + reference_pos, 1 + reference_pos, self.width + reference_pos, -1 + reference_pos]
+		where_to_look = [self.width + reference_pos, - self.width + reference_pos, 1 + reference_pos, -1 + reference_pos]
 		counter = 0
+		print(where_to_look)
 		while counter < len(where_to_look):
 			try:
 				# UP space
 				close_spaces.append(self.final_form[where_to_look[counter]])
+				print(self.final_form[where_to_look[counter]])
 			except:
 				close_spaces.append("Out of Bounds")
 			counter += 1
+		
+		print(close_spaces)
 		return close_spaces
 
 class Rat:
 
-	def __init__(self, columns, start_at):
+	def __init__(self, columns):
 		self.map = []
 		self.columns = columns
-		self.position = start_at
-		self.moviments = {'Up': -self.columns, 'Right': 1, 'Down': self.columns,  'Left': -1}
+		self.position = 0
+		self.moviments = {'Up': self.columns, 'Down': - self.columns, 'Right': 1, 'Left': -1}
 		self.last_position = 0
-		self.moves_made = []
 
 	def choose_moviment(self, around):
 		counter = 0
-		directions = ['Up', 'Right', 'Down', 'Left']
 		for space in around:
-			print(space.wall)
-			print(counter)
-			print(self.position)
 			
-			if space.wall == False:
-				return directions[counter]
+			if space == 0:
+				return 'Up' if counter == 0 else 'Down' if counter == 1 else 'Right' if counter == 2 else 'Left'
 			counter += 1	
 
 	def walk(self, around):
 		self.last_position = self.position
-		move_chosen = self.choose_moviment(around)
-		self.position += self.moviments[move_chosen]
-		self.moves_made.append(move_chosen)
+		self.position += self.moviments[self.choose_moviment(around)]
 
 class Displayer:
 
@@ -119,9 +69,10 @@ class Displayer:
 		while counter < 30:
 			break_line = 0
 			position = 0
-			last_space = False
-			self.board.final_form[self.rat.position] = Space(False, rat = True)
-			while break_line < self.board.width and last_space != True:
+			last_position = False
+			self.board.final_form[self.rat.last_position] = 0
+			self.board.final_form[self.rat.position] = 'R'
+			while break_line < self.board.width and last_position != True:
 
 				if break_line == 0:
 					print(f"| {self.board.final_form[position]} | ", end = '')
@@ -136,24 +87,21 @@ class Displayer:
 					break_line = 0
 
 				if position == len(self.board.final_form) - 1:
-					last_space = True
+					last_position = True
 				
 				else:
 					position +=1
 
-			sleep(1)
-			system('clear')
+			sleep(0.5)
 			self.start_run()
-			self.board.final_form[self.rat.last_position] = Space(False)
 			counter +=1
 
 
 
 if __name__ == "__main__":
 
-	my_board = Board(9,10,[21,22,23,15,25,35,45,44,43])
+	my_board = Board(9,10,[2,20,38,45,82])
 	my_board.setup_lab()
-	my_rat = Rat(my_board.width, 11)
+	my_rat = Rat(my_board.width)
 	my_displayer = Displayer(my_board, my_rat)
 	my_displayer.display_board()
-	print(my_rat.moves_made)

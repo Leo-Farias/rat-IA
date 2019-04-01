@@ -36,3 +36,16 @@ class Lab_Data_Manager(Data_Manager):
 		will return us the number of columns.
 		"""
 		return len(self.data[1])
+
+	def get_close_spaces(self, position_ref):
+		"""
+		- This method will return the spaces and "coordenates" from a position 
+		given, the spaces will be given in a list as [up, right, down , left]
+
+		- Position_ref must be a list that represents the x and y coordenates.
+		"""
+		x = position_ref[1]
+		y = position_ref[0]
+		close_spaces = [self.data[y - 1][x], self.data[y][x + 1], self.data[y + 1][x], self.data[y][x - 1]]
+		return close_spaces
+

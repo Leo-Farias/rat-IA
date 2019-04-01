@@ -31,7 +31,11 @@ class Artist():
 		self.first_point_X = 25 # This is where the artist will start drawing in X
 		self.first_point_Y = 30 # This is where the artist will start drawing in Y
 
-	def draw_labirynth(self, lab_data):
+	def clear_paiting(self):
+		for element in self.drawing_space.winfo_children():
+			element.destroy()
+
+	def draw(self, lab_data):
 		'''
 		This method is responsible for showing the labyrinth based on the data passed, such as
 		if the block is a wall or empty space.
@@ -57,4 +61,6 @@ class Artist():
 			point_Y += move
 
 		self.drawing_space.pack()
-		self.window.mainloop()
+		self.window.update_idletasks()
+		self.window.update()
+

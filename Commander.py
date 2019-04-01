@@ -1,5 +1,7 @@
 import DataManager
 import Interface
+import Actioner
+from time import sleep
 
 # SAVING THE SPACES IN A LIST
 # EACH ITEM OF THE LIST REPRESENTS A LINE, 
@@ -32,10 +34,27 @@ labirynth = [
 	[1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 2, 1, 0, 1, 1],
 	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]]
 
-lab_manager = DataManager.Lab_Data_Manager(labirynth)
+labirynth = DataManager.Lab_Data_Manager(labirynth)
 
 interface = Interface.Viewer()
 interface.config_basic()
 
 da_vinci = Interface.Artist(interface.window, interface.canvas)
-da_vinci.draw_labirynth(lab_manager.data)
+
+mickey = Actioner.Rat(1,1)
+
+while True:
+
+	da_vinci.draw(labirynth.data)
+	labirynth.data[mickey.y][mickey.x] = 4
+	mickey.walk(labirynth.get_close_spaces(mickey.position))
+	if labirynth.data[mickey.y][mickey.x] == 2:
+		print('Finished.')
+		break
+	else:
+		labirynth.data[mickey.y][mickey.x] = 3
+
+	sleep(0.5)
+	for element in da_vinci.drawing_space.winfo_children():
+		 element.destroy()
+

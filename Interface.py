@@ -31,7 +31,7 @@ class Artist():
 		self.first_point_X = 25 # This is where the artist will start drawing in X
 		self.first_point_Y = 30 # This is where the artist will start drawing in Y
 
-	def clear_paiting(self):
+	def clear_painting(self):
 		for element in self.drawing_space.winfo_children():
 			element.destroy()
 

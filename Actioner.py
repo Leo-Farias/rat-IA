@@ -79,13 +79,13 @@ class Rat:
 		bifurc = (False, False)# It will check if the bifurcations are avaible, right/left or up/down
 		dir_as_num = options.index(self.direction) # Direction as number. This will give us the position in the list of the direction
 
+		print(dir_as_num %2 == 0)
+		bifurc = self.set_bifurcation((1,3), around) if dir_as_num %2 == 0 else self.set_bifurcation((0,2), around)
 		# this if statement will tell if the rat found a wall in its straight walk.
 		# the index function is used to get the position of the direction on the list
 		# and then check the same position for the around list.
 		if around[dir_as_num] not in [0,2,4]:
 			print("Hey")
-			
-			bifurc = self.set_bifurcation((0,2), around) if dir_as_num %2 == 0 else self.set_bifurcation((1,3), around)
 			
 			if bifurc == (True, True):
 				node = True
@@ -114,4 +114,6 @@ class Rat:
 
 
 		moviments[self.direction]()
+		print(self.direction)
+		print(bifurc)
 		self.position = [self.y, self.x]

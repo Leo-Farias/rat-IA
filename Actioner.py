@@ -18,19 +18,18 @@ class Rat:
 
 	def walk(self, around):
 		choice = "default"
-		self.moviments = {"Up": [self.y - 1, self.x],
+		moviments = {"Up": [self.y - 1, self.x],
 						"Right": [self.y, self.x + 1],
 						"Down": [self.y + 1, self.x],
 						"Left": [self.y, self.x - 1]}
 		options = ["Up", "Right", "Down", "Left"]
 		counter = 0
+		change_direction = False
 		
 		for space in around:
 			
-			if space == 0 or space == 2:
-				choice =  options[counter]
-				break
-			counter += 1
 
-		self.position = self.moviments[choice]
+		#If the choice remains as "default" than it means that the rat found a dead end.
+
+		self.position = moviments[choice]
 		self.update_coordenates(self.position[1], self.position[0])	

@@ -62,19 +62,18 @@ class Rat:
 
 	def go_to_bifurc(self, options):
 		
-		print("Dead End. Going to Bifurc.")
+		print("Going to: ", self.dp_location[-1])
 		destination = self.dp_location.pop()
 		step = destination[0]
 		d_to_d = destination[1]
 		self.steps_to_dest = self.step_counter - step
-		self.searching_bifurc = True
-		direction = d_to_d + 2 if d_to_d < 2 else d_to_d - 2
-
+		direction = 0 if d_to_d == 2 else 1 if d_to_d == 3 else 2 if d_to_d == 0 else 3
 		return options[direction]
 
 	def make_decision(self, bifurc, options, dir_as_num, back = False):
 		
 		if bifurc == (False, False) or back == True:
+			self.searching_bifurc = True
 			return self.go_to_bifurc(options)
 
 		elif bifurc == (True, True):
@@ -83,15 +82,18 @@ class Rat:
 			return  options[dir_as_num]
 
 		else:
-			# making this change so we dont get an out of range error
-			if dir_as_num == 3:
-				dir_as_num = 1
+			if dir_as_num == 0 or dir_as_num == 2:
+				if bifurc[0] == True:
+					dir_as_num = 1
+				else:
+					dir_as_num = 3
 
-			# Making sure the rat will choose the avaible path.
-			if bifurc[0] == True:
-				dir_as_num -= 1
 			else:
-				dir_as_num += 1
+				if bifurc[0] == True:
+					dir_as_num = 0
+				else:
+					dir_as_num = 2
+
 
 			return options[dir_as_num]
 
@@ -123,25 +125,24 @@ class Rat:
 		if self.searching_bifurc == True:
 			self.steps_to_dest -= 1
 			if self.steps_to_dest == 0:
-				print("Found Bifurc")
+				
+				self.searching_bifurc = False
+
 				if around.count(0) == 0:
-					print("Goin to next bifurc.")
-					self.dp_location.pop()
 					self.direction = self.make_decision(bifurc, options, dir_as_num, back = True)
 				else:
 					self.direction = self.make_decision(bifurc, options, dir_as_num)
-				self.searching_bifurc = False
 
 		# this if statement will tell if the rat found a wall in its straight walk.
 		elif around[dir_as_num] not in [0,2,4]:
-			print("Collision")
 			self.direction = self.make_decision(bifurc, options, dir_as_num)
 
-		if bifurc != (False,False):
+		if bifurc != (False,False) and around.count(0) != 0:
+			dir_as_num = options.index(self.direction) # getting the new dir_as_num position
 			self.dp_location.append((self.step_counter, dir_as_num))
 
 		moviments[self.direction]()
 		self.position = [self.y, self.x]
 		self.step_counter = self.step_counter + 1 if self.searching_bifurc != True else self.step_counter - 1
-		print(self.dp_location)
+		
 

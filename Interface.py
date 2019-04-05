@@ -34,6 +34,8 @@ class Artist():
 	def clear_painting(self):
 		for element in self.drawing_space.winfo_children():
 			element.destroy()
+		self.window.update_idletasks()
+		self.window.update()
 
 	def draw(self, lab_data):
 		'''

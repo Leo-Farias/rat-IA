@@ -63,7 +63,7 @@ while True:
 		#updating the rat position in the lab data.
 		labyrinth.data[mickey.y][mickey.x] = 3
 
-	sleep(0.05)
+	sleep(0.0001)
 	
 	#clearing the vieweer for new draw
 	da_vinci.clear_painting()

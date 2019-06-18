@@ -7,14 +7,32 @@ class Rat:
 
 	def __init__(self, x, y):
 		
-		self.x = x
-		self.y = y
-		self.position = [self.x, self.y]
-		self.dp_location = []
-		self.direction = "Right"
-		self.step_counter = 0
-		self.searching_bifurc = False
-		self.steps_to_dest = 0
+		self.x = x # The x position of the rat in the lab
+		self.y = y # The y position of the rat in the lab
+		self.position = [self.x, self.y] # The position (coordinate)
+		self.dp_location = [] # list of known bifurcations
+		self.direction = "Right" # Direction where the rat is moving, set to right as the start.
+		self.step_counter = 0 # count the number os steps the rat had done CORRECTLY
+		self.searching_bifurc = False # Variable to check if the rat is going back the path.
+		self.steps_to_dest = 0 # Steps that he must go back to get to the last known bifurc.
+		self.correct_path = "" # Final array that will set the "best" path the rat can take from the run.
+
+	def remove_last(self):
+		'''
+		Function that removes the last item from a string/list and turns it back to string.
+		'''
+
+		self.correct_path = self.correct_path.split()
+
+		self.correct_path.pop(-1)
+
+		result = ""
+
+		for item in self.correct_path:
+
+			result += item + " "
+
+		return result
 
 	def go_up(self):
 		'''
@@ -61,7 +79,9 @@ class Rat:
 		return possibilities
 
 	def go_to_bifurc(self, options):
-		
+		# This method will make the rat go to the last bifurc
+		# it will also set the direction to the oposite so it goes back the same path.
+
 		destination = self.dp_location.pop()
 		step = destination[0]
 		d_to_d = destination[1]
@@ -70,26 +90,33 @@ class Rat:
 		return options[direction]
 
 	def make_decision(self, bifurc, options, dir_as_num, around, check = False, know_all = False):
-		
+		# Method that will set where the rat should go, first if he has been to all the possible places before.
+		# Or got to an dead end.
 		if bifurc == (False, False) or know_all == True:
 			self.searching_bifurc = True
 			return self.go_to_bifurc(options)
 
+		# then if he isnt, he will check where he must look.
 		elif check == True:
 
 			if around.count(2) != 0:
-				print('Hell yeah!')
 				dir_as_num = around.index(2)
 			else:
 				dir_as_num = around.index(0)
 			
 			return options[dir_as_num]
 
+		# Else he finds a bifurc with 2 paths, he will choose as goes: 
+		# from Up -> Left
+		# from Right -> Down
+		# from Down -> Right
+		# from left -> Up 
 		elif bifurc == (True, True):
 			
 			dir_as_num -= 1
 			return  options[dir_as_num]
 
+		# And the last case, if the bifurc has only one path, he will choose it correctly.
 		else:
 			if dir_as_num == 0 or dir_as_num == 2:
 				if bifurc[0] == True:
@@ -153,6 +180,34 @@ class Rat:
 
 		moviments[self.direction]()
 		self.position = [self.y, self.x]
-		self.step_counter = self.step_counter + 1 if self.searching_bifurc != True else self.step_counter - 1
+
+
+		# Now, before he actually counts the step, he saves in the correct_path list, and if he was going back,
+		# then he must remove the incorrect step from the list.
+		if not self.searching_bifurc:
+			self.step_counter += 1
+			self.correct_path += self.direction + " "
+		else:
+			self.step_counter -= 1
+			self.correct_path = self.remove_last()
+
+
+	def follow_path(self):
+		'''
+		This is the method that the rat will follow in case he already knows a the labyrinth and is 
+		starting at the same position
+		'''
+		
+		moviments = {"Up": self.go_up,
+						"Right": self.go_right,
+						"Down": self.go_down,
+						"Left": self.go_left}
+		self.direction = self.correct_path.pop(0)
+
+		moviments[self.direction]()
+		self.position = [self.y, self.x]
+
+
+
 		
 

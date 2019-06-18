@@ -36,6 +36,7 @@ class Artist():
 			element.destroy()
 		self.window.update_idletasks()
 		self.window.update()
+		self.drawing_space.delete(ALL)
 
 	def draw(self, lab_data):
 		'''
@@ -65,4 +66,5 @@ class Artist():
 		self.drawing_space.pack()
 		self.window.update_idletasks()
 		self.window.update()
+		
 

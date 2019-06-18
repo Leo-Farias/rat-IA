@@ -1,19 +1,13 @@
-class Data_Manager:
+class Data_Manager():
 	'''
 	Class that will help in sorting the data used in the program, for example, 
 	how to save the labyrinth data or the blocks coordenates.
 	'''
 	def __init__(self, data):
-		"""
+		'''
 		Data is the parameter that will pass the list or other data structure itself
-		"""
+		'''
 		self.data = data
-
-
-class Lab_Data_Manager(Data_Manager):
-	
-	def __init__(self, data):
-		super(Lab_Data_Manager, self).__init__(data)
 
 	def update_lab(self, rat_new_pos, rat_last_pos):
 		"""

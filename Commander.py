@@ -1,6 +1,7 @@
 import DataManager
 import Interface
 import Actioner
+import Checker
 from time import sleep
 
 # SAVING THE SPACES IN A LIST
@@ -16,7 +17,7 @@ labyrinth = [
 	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 	[1, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
 	[1, 0, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1],
-	[1, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1],
+	[1, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 2, 0, 1],
 	[1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 0, 1],
 	[1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1],
 	[1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1],
@@ -28,14 +29,14 @@ labyrinth = [
 	[1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 0, 1],
 	[1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1],
 	[1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1],
-	[1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 2, 0, 1],
+	[1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1],
 	[1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1],
 	[1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1],
 	[1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1],
 	[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]]
 
 # Creating our objects
-labyrinth = DataManager.Lab_Data_Manager(labyrinth)
+pandin = DataManager.Data_Manager(labyrinth)
 
 interface = Interface.Viewer()
 interface.config_basic() #setting window size values
@@ -44,27 +45,49 @@ da_vinci = Interface.Artist(interface.window, interface.canvas)
 
 mickey = Actioner.Rat(1,1)
 
+machado = Checker.Checker()
+
+following_correct_path = machado.check_value(labyrinth, "files/last_lab")
+
+machado.write_value(labyrinth, "files/last_lab")
+
 while True:
 
-	#Showing the labyrinth
-	da_vinci.draw(labyrinth.data)
+	#Showing the pandin
+	da_vinci.draw(pandin.data)
 
 	#Saving last position as 4, spaces already walked by the rat
-	labyrinth.data[mickey.y][mickey.x] = 4
+	pandin.data[mickey.y][mickey.x] = 4
 
-	# Rat chooses it's moviment.
-	mickey.walk(labyrinth.get_close_spaces(mickey.position))
-	
-	# If statement for end game
-	if labyrinth.data[mickey.y][mickey.x] == 2:
-		print('Finished.')
-		break #if the game finished then it will break the loop
+	if not following_correct_path:
+
+		# Rat chooses it's moviment.
+		mickey.walk(pandin.get_close_spaces(mickey.position))
+		
+		# If statement for end game
+		if pandin.data[mickey.y][mickey.x] == 2:
+			print('Finished.')
+			machado.write_value(mickey.correct_path, 'files/correct_path')
+			break #if the game finished then it will break the loop
+		else:
+			#updating the rat position in the lab data.
+			pandin.data[mickey.y][mickey.x] = 3
+
 	else:
-		#updating the rat position in the lab data.
-		labyrinth.data[mickey.y][mickey.x] = 3
 
-	sleep(0.0001)
+		# We only update the first time.
+		if len(mickey.correct_path) == 0:
+			mickey.correct_path = machado.get_value('files/correct_path').split()
+		mickey.follow_path()
+
+		if len(mickey.correct_path) == 0:
+			print('Finished')
+			break
+
+		else:
+			pandin.data[mickey.y][mickey.x] = 3
+
+	sleep(0.01)
 	
 	#clearing the vieweer for new draw
 	da_vinci.clear_painting()
-
